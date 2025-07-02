@@ -4,29 +4,36 @@ description: >-
   in ObjectBox C / C++ database.
 ---
 
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
 # Relations
+
+Learn how to create and update to-one and to-many relations between entities in ObjectBox C / C++ database.
+
 
 Objects may reference other objects, for example using a simple reference or a list of objects. In database terms, we call those references **relations**. The object defining a relation we call the **source** object, the referenced object we call the **target** object. So a relation has a direction.\
 \
 If there is one target object, we call the relation **to-one.** And if there can be multiple target objects, we call it **to-many**. Note, the direction of the relation matters, as there's also a link back in the reverse direction (the "backlink").
 
-{% hint style="info" %}
+:::info
 If you are familiar with **1:N and N:M relations**, here are the corresponding object relations in ObjectBox:
 
 1:N (one-to-many): to-one relation with its backlink\
 N:M (many-to-many): to-many relation with its backlink
-{% endhint %}
+:::
 
 ## To-One Relations
 
-<figure><img src=".gitbook/assets/spaces_-LETufmyus5LFkviJjr4_uploads_1fSQLwbLzX2umwPHx2o3_to-one-relations.webp" alt=""><figcaption></figcaption></figure>
+<img src=".gitbook/assets/spaces_-LETufmyus5LFkviJjr4_uploads_1fSQLwbLzX2umwPHx2o3_to-one-relations.webp" alt=""/><figcaption></figcaption>
 
 ### To-One Relation Schema Definition
 
 You define a to-one relation by using the property annotation `objectbox:relation=<TargetEntity>` in the source entity definition.
 
-{% code title="schema.fbs" %}
-```
+```fbs title="schema.fbs"
 table Customer {
     id: ulong;
     name: string;
@@ -39,7 +46,6 @@ table Order {
     customerId: ulong;
 }
 ```
-{% endcode %}
 
 ### Queries using Relation Links
 
@@ -47,17 +53,19 @@ You can use relations in queries to combine query conditions across multiple ent
 
 Example for finding all "Potato" orders by customers who's name starts with "O":
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 QueryBuilder<Order> qb = ordersBox.query( Order_::product.equals("Potato") );
 QueryBuilder<Customer> qbCustomer = qb.link( Order_::customerId );
 qbCustomer.with( Customer_::name.startsWith("O") );
 auto orders = qb.build().find(); 
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_query_builder* qb = obx_query_builder(store, Order_ENTITY_ID);
 obx_qb_equals_string(qb, Order_PROP_ID_product, "Potato", true);
@@ -69,8 +77,9 @@ obx_qb_starts_with_string(qbCustomer, Customer_PROP_ID_name, "O", true);
 OBX_query* query = obx_query(qb);
 OBX_bytes_array* orders = obx_query_find(query);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ### To-One Backlinks
 
@@ -82,17 +91,19 @@ To create a query following the backlink (the "reverse" direction), you can call
 
 Example for finding all customers with their name starting with "O" and who ordered potatoes:
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 QueryBuilder<Customer> qb = customersBox.query( Customer_::name.startsWith("O") );
 QueryBuilder<Order> qbOrder = qb.backlink( Order_::customerId );
 qbOrder.with( Order_::product.equals("Potato") );
 auto customers = qb.build().find();
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_query_builder* qb = obx_query_builder(store, Customer_ENTITY_ID);
 obx_qb_starts_with_string(qb, Customer_PROP_ID_name, "O", true);
@@ -104,19 +115,19 @@ obx_qb_starts_with_string(qbOrder, Order_PROP_ID_product, "Potato", true);
 OBX_query* query = obx_query(qb);
 OBX_bytes_array* list = obx_query_find(query);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ## Many-To-Many Relations
 
-<figure><img src=".gitbook/assets/many-to-many.png" alt=""><figcaption></figcaption></figure>
+<img src=".gitbook/assets/many-to-many.png" alt=""/><figcaption></figcaption>
 
 ### To-Many Relation Schema Definition
 
 You define a many-to-many relation by using the entity annotation `objectbox:relation(name=<SourceRelFieldName>,to=<TargetEntity>)`and apply it on source entity definition.
 
-{% code title="schema.fbs" %}
-```
+```fbs title="schema.fbs"
 table Teacher {
     id: ulong;
     name: string;
@@ -128,7 +139,6 @@ table Student {
     name: string;
 }
 ```
-{% endcode %}
 
 ### Setting Many-to-Many Relations
 
@@ -136,19 +146,22 @@ In contrast to to-one relations, many-to-many relations are stored "standalone" 
 
 Example for putting a "teachers" relation from Student "Ferris" to Teacher "Rooney".
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 students.standaloneRelPut<Teacher>(Student_::teachers, id_ferris, id_mr_rooney );  
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 obx_box_rel_put(students, Student_REL_ID_teachers, id_ferris, id_rooney);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ### Query with Many-to-Many Relations
 
@@ -156,17 +169,19 @@ Similar to To-One relations, building queries across relation links is done usin
 
 Example for finding all students of Teacher "Rooney":
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 QueryBuilder<Students> qb = studentsBox.query();
 QueryBuilder<Teacher> qbTeacher = qb.link<Teacher>(Student_::teachers);
 qbTeacher.with(Teacher_::name.equals("Rooney"));
 auto students = qb.build().find();
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_query_builder* qb = obx_query_builder(store, Student_ENTITY_ID);
 
@@ -176,13 +191,15 @@ obx_qb_equals_string(qbTeachers, Teacher_PROP_ID_name, "Rooney", true);
 OBX_query* query = obx_query(qb);
 OBX_bytes_array* list = obx_query_find(query);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 Example for finding all teachers  of Student "Ferris":
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 QueryBuilder<Teacher> qb = teachers.query();
 QueryBuilder<Students> qbStudents = qb.backlink<Student>(Student_::teachers);
@@ -190,9 +207,10 @@ qbStudents.with(Student_::name.equals("Ferris"));
 auto teachers = qb.build().find();
 
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_query_builder* qb = obx_query_builder(store, Teacher_ENTITY_ID);
 
@@ -202,5 +220,6 @@ obx_qb_equals_string(qbStudent, Student_PROP_ID_name, "Ferris", true);
 OBX_query* query = obx_query(qb);
 OBX_bytes_array* list = obx_query_find(query);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>

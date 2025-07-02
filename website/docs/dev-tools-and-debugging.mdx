@@ -5,7 +5,15 @@ description: >-
   information.
 ---
 
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
 # Dev Tools and Debugging
+
+ObjectBox has tools that help during development. Learn more about looking at data inside the database and how to enable debug logs for additional information.
+
 
 ## Database Viewer
 
@@ -24,11 +32,11 @@ Starting server on http://0.0.0.0:8081
 
 Opening the URL `http://localhost:8081` with your browser will open the ObjectBox Admin UI:
 
-<figure><img src="https://2056134408-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-LETufmyus5LFkviJjr4%2Fuploads%2F4l4B1wXLIHFxdoxtBEAn%2Fadmin-data.png?alt=media&#x26;token=b2faf98f-75a0-448b-8154-4cefcdcaa05f" alt=""><figcaption></figcaption></figure>
+<img src="https://2056134408-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-LETufmyus5LFkviJjr4%2Fuploads%2F4l4B1wXLIHFxdoxtBEAn%2Fadmin-data.png?alt=media&#x26;token=b2faf98f-75a0-448b-8154-4cefcdcaa05f" alt="" /><figcaption></figcaption>
 
-{% hint style="info" %}
+:::info
 See [ObjectBox Admin](https://docs.objectbox.io/data-browser) Documentation for further details and to download developer-friendly front-end launcher shell script.
-{% endhint %}
+:::
 
 ## Logging
 
@@ -60,13 +68,12 @@ $ ./build/myapp
 [..]
 ```
 
-{% hint style="info" %}
+:::info
 See [C API Documentation of OBXDebugFlag](https://objectbox.io/docfiles/c/current/group\_\_c.html#gade842fb1271541e05f848925f32efa9d) for a list of available debug flags.&#x20;
-{% endhint %}
+:::
 
-{% hint style="info" %}
+:::info
 ObjectBox also offers a **DebugLog** which gives insights at a very detail level. This is typically not used by an application end-user but might be helpful when things go wrong or when developing improvements, enhancements and features. \
 \
 This feature is not available in the public release but on request.
-{% endhint %}
-
+:::

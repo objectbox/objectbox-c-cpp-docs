@@ -4,19 +4,27 @@ description: >-
   ObjectBox.
 ---
 
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
 # Generator
 
-{% hint style="info" %}
+This is the reference guide on the ObjectBox Generator, a build-time tool for ObjectBox.
+
+
+:::info
 For an intro to the generator, see also the [installation guide](installation.md#objectbox-generator) and [Generating Binding Code](getting-started.md#generating-binding-code).
-{% endhint %}
+:::
 
 When using ObjectBox within your project, you typically need two things: the runtime library and the the build-time ObjectBox Generator. The generator takes a data model (see [Entity Annotations](entity-annotations.md)) as input and generates `struct`s, a data model representation as code and additional glue code for a tight and fast integration of your individual data types and the ObjectBox API.
 
 If you are using CMake, it's highly recommended to use the CMake integration of the ObjectBox Generator. For all other setups, triggering the generator in [standalone mode](generator.md#standalone) is also supported.
 
-{% hint style="info" %}
+:::info
 The ObjectBox Generator binary is currently not available for Linux/Windows ARM architectures (pull requests are welcome). The macOS as universal binary supports ARM64 and AMD64 architectures.
-{% endhint %}
+:::
 
 ## CMake Integration
 
@@ -87,9 +95,9 @@ The CMake module is implicitly downloaded together with objectbox shared librari
 \
 The latest version of the find module is also available from [https://raw.githubusercontent.com/objectbox/objectbox-generator/main/cmake/FindObjectBoxGenerator.cmake](https://raw.githubusercontent.com/objectbox/objectbox-generator/main/cmake/FindObjectBoxGenerator.cmake)
 
-{% hint style="info" %}
+:::info
 Automatic download of ObjectBox-Generator executables can be disabled via CMake Option `OBX_GENERATOR_ALLOW_FETCH` set to `FALSE`.
-{% endhint %}
+:::
 
 The generator repository provides a CMake find module for `find_package` .
 

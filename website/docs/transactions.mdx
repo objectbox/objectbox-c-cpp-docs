@@ -4,7 +4,15 @@ description: >-
   gives developers Multiversion concurrency control (MVCC) semantics.
 ---
 
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
 # Transactions
+
+The ObjectBox database is transactional and fully ACID compliant. ObjectBox gives developers Multiversion concurrency control (MVCC) semantics.
+
 
 ## What is a database transaction?
 
@@ -22,9 +30,9 @@ Understanding the transaction basics can help you to make your app more consiste
 
 An implicit transaction is a transaction that is started automatically. An explicit one is started by a call to `store.tx()/obx_txn_write(store)`and is active until marked successful or aborted. By default, all Box operations run in implicit transactions unless an explicit transaction is in progress on the same thread. In the latter case, multiple operations share the (explicit) transaction. This means:
 
-{% hint style="info" %}
+:::info
 With explicit transactions, you control the transaction boundary. You can use this to improve efficiency and consistency in your app.
-{% endhint %}
+:::
 
 Advantages of explicit database transactions:
 
@@ -34,8 +42,9 @@ Advantages of explicit database transactions:
 
 Example for a write transaction which just inserts 1 000 000 objects (assumes an opened store & box):
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Transaction tx = store.txWrite();
 for (int i = 1000000; i > 0; i--) {
@@ -43,9 +52,10 @@ for (int i = 1000000; i > 0; i--) {
 }
 tx.success();
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_txn* tx = obx_txn_write(store);
 for (int i = 1000000; i > 0; i--) {
@@ -56,8 +66,9 @@ obx_txn_success(txn);
 
 // don't forget to check results of all the C-API calls
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 Understanding transactions is essential to mastering the database performance. If you just remember one sentence on this topic, it should be this one: a write transaction has its price, and it's the same whether it's implicit or explicit.
 
@@ -77,8 +88,8 @@ Note that you do not have to worry about making write transactions sequential yo
 
 #### Locking inside a Write Transaction
 
-{% hint style="danger" %}
+:::danger
 Avoid locking (e.g. with a mutex) when inside a write transaction when possible.
-{% endhint %}
+:::
 
 Because write transactions run exclusively, they effectively acquire a write lock internally. As with all locks, you need to pay close attention when multiple locks are involved. Always obtain locks in the same order to avoid deadlocks. If you acquire a lock “X” inside a transaction, you must ensure that your code does not start another write transaction while having the same lock “X”.
