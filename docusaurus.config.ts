@@ -50,7 +50,7 @@ const config: Config = {
         routeBasePath: '/',                      // serve docs at /
         sidebarPath: require.resolve('./sidebars.ts'),
         editUrl:
-          'https://github.com/objectbox/objectbox-c-cpp-docs/blob/main/website/',
+          'https://github.com/objectbox/objectbox-c-cpp-docs/blob/main/',
       },
       // If you don't need a blog, you can disable it:
       blog: false,
@@ -105,7 +105,7 @@ const config: Config = {
           //target: '_self', // ← This prevents external link behavior
         },
         {
-          href: 'https://twitter.com/objectbox_io',
+          href: 'https://x.com/objectbox_io',
           label: 'Follow us',
           position: 'right',
           //target: '_self', // ← This prevents external link behavior
