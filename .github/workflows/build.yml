@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
     - name: Checkout repository
@@ -24,5 +24,12 @@ jobs:
     - name: Run type check
       run: npm run typecheck
       
-    - name: Build documentation
-      run: npm run build
+    - name: Build documentation and check for warnings
+      run: |
+        npm run build 2>&1 | tee build.log
+        if grep -i "warning" build.log; then
+          echo " Build completed with warnings. Failing the build."
+          exit 1
+        else
+          echo " Build completed without warnings."
+        fi
