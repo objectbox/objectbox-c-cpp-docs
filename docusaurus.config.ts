@@ -93,7 +93,7 @@ const config: Config = {
           //target: '_self', // ← This prevents external link behavior
         },
         {
-          href: 'https://docs.objectbox.io/sync',
+          href: 'https://sync.objectbox.io',
           label: 'Data Sync Docs', 
           position: 'right',
           //  target: '_self', // ← This prevents external link behavior
@@ -110,7 +110,13 @@ const config: Config = {
           position: 'right',
           //target: '_self', // ← This prevents external link behavior
         },
-        
+        {
+          href: 'https://github.com/objectbox/objectbox-c-cpp-docs',
+          label: 'GitHub (Docs)',
+          position: 'right',
+          //target: '_self', // ← This prevents external link behavior
+        },
+
       ],
     },
     copyright: `© ${new Date().getFullYear()} ObjectBox`,
