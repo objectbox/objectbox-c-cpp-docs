@@ -1,22 +1,48 @@
 ---
-description: >-
-  This is the reference guide on the ObjectBox Generator, a build-time tool for
-  ObjectBox.
+title: "Generator - ObjectBox C++"
+description: "This is the reference guide on the ObjectBox Generator, a build-time tool for ObjectBox."
+keywords:
+  - objectbox
+  - c++
+  - cpp
+  - cmake
+  - database
+  - generator
 ---
+
+
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
+
+import { TechnicalArticleSchema } from '@site/src/components/Schema';
+
+<TechnicalArticleSchema
+  headline="Generator - ObjectBox C++"
+  description="This is the reference guide on the ObjectBox Generator, a build-time tool for ObjectBox."
+  url="https://cpp.objectbox.io/generator"
+  datePublished="2025-07-21"
+  dateModified="2025-07-21"
+/>
 
 # Generator
 
-{% hint style="info" %}
-For an intro to the generator, see also the [installation guide](installation.md#objectbox-generator) and [Generating Binding Code](getting-started.md#generating-binding-code).
-{% endhint %}
+This is the reference guide on the ObjectBox Generator, a build-time tool for ObjectBox.
 
-When using ObjectBox within your project, you typically need two things: the runtime library and the the build-time ObjectBox Generator. The generator takes a data model (see [Entity Annotations](entity-annotations.md)) as input and generates `struct`s, a data model representation as code and additional glue code for a tight and fast integration of your individual data types and the ObjectBox API.
 
-If you are using CMake, it's highly recommended to use the CMake integration of the ObjectBox Generator. For all other setups, triggering the generator in [standalone mode](generator.md#standalone) is also supported.
+:::info
+For an intro to the generator, see also the [installation guide](installation#objectbox-generator) and [Generating Binding Code](getting-started#generating-binding-code).
+:::
 
-{% hint style="info" %}
+When using ObjectBox within your project, you typically need two things: the runtime library and the the build-time ObjectBox Generator. The generator takes a data model (see [Entity Annotations](entity-annotations)) as input and generates `struct`s, a data model representation as code and additional glue code for a tight and fast integration of your individual data types and the ObjectBox API.
+
+If you are using CMake, it's highly recommended to use the CMake integration of the ObjectBox Generator. For all other setups, triggering the generator in [standalone mode](generator#standalone) is also supported.
+
+:::info
 The ObjectBox Generator binary is currently not available for Linux/Windows ARM architectures (pull requests are welcome). The macOS as universal binary supports ARM64 and AMD64 architectures.
-{% endhint %}
+:::
 
 ## CMake Integration
 
@@ -24,7 +50,7 @@ The ObjectBox Generator is well integrated into CMake.&#x20;
 
 Enabling the Generator via CMake
 
-Once you have the ObjectBox runtime library set up via `FetchContent` (see [installation](installation.md)), it only takes one more command to enable the Generator:
+Once you have the ObjectBox runtime library set up via `FetchContent` (see [installation](installation)), it only takes one more command to enable the Generator:
 
 ```cmake
 # Note: downloads automatically if not found locally
@@ -83,13 +109,13 @@ By default, generated files (except the model JSON file) are written relative to
 
 ### Details on finding the CMake module
 
-The CMake module is implicitly downloaded together with objectbox shared libraries as described in [Installation](installation.md).\
+The CMake module is implicitly downloaded together with objectbox shared libraries as described in [Installation](installation).\
 \
 The latest version of the find module is also available from [https://raw.githubusercontent.com/objectbox/objectbox-generator/main/cmake/FindObjectBoxGenerator.cmake](https://raw.githubusercontent.com/objectbox/objectbox-generator/main/cmake/FindObjectBoxGenerator.cmake)
 
-{% hint style="info" %}
+:::info
 Automatic download of ObjectBox-Generator executables can be disabled via CMake Option `OBX_GENERATOR_ALLOW_FETCH` set to `FALSE`.
-{% endhint %}
+:::
 
 The generator repository provides a CMake find module for `find_package` .
 

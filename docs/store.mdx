@@ -1,11 +1,36 @@
 ---
-description: >-
-  The "Store" is typically your first touching point with the ObjectBox API. It
-  represents a database you can open and get further API object to interact with
-  it.
+title: "Store - ObjectBox C++"
+description: "The \"Store\" is typically your first touching point with the ObjectBox API. It represents a database you can open and get further API object to interact with it."
+keywords:
+  - objectbox
+  - c++
+  - cpp
+  - cmake
+  - database
+  - store
 ---
 
+
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
+
+import { TechnicalArticleSchema } from '@site/src/components/Schema';
+
+<TechnicalArticleSchema
+  headline="Store - ObjectBox C++"
+  description="The 'Store' is typically your first touching point with the ObjectBox API. It represents a database you can open and get further API object to interact with it."
+  url="https://cpp.objectbox.io/store"
+  datePublished="2025-07-21"
+  dateModified="2025-07-21"
+/>
+
 # Store
+
+The "Store" is typically your first touching point with the ObjectBox API. It represents a database you can open and get further API object to interact with it.
+
 
 ## Store Options
 
@@ -15,8 +40,9 @@ When creating a store, you can provide additional options like the database mode
 
 The model specifies available entities in an ObjectBox database. It is usually specified using FlatBuffer IDL files processed by the ObjectBox Generator to output a `objectbox-model.h` header file for C and C++ users.&#x20;
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 #include "objectbox-model.h"
 OBX_model* model = create_obx_model();
@@ -24,9 +50,10 @@ OBX_model* model = create_obx_model();
 obx::Options options(model);
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 #include "objectbox-model.h"
 OBX_model* model = create_obx_model();
@@ -35,56 +62,63 @@ OBX_store_options* opt = obx_opt();
 obx_opt_model(opt, model);
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ### Storage Location
 
 ObjectBox persists data per default to files in a directory named "`objectbox`". Use the following option to configure the directory to your application needs.
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options.directory("resources/mydb");
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_directory(opt, "resources/mydb");
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 #### In-Memory Databases
 
-{% hint style="info" %}
+:::info
 Available since v0.21.0
-{% endhint %}
+:::
 
 You can use ObjectBox alsofor non-persistent in-memory databases. To create a memory-backed store, use the directory prefix "`memory:`" and pick a name for the database to address it, e.g. “memory:myApp”. Apart from the special prefix, it's using the same "directory" option call:
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options.directory("memory:myApp");
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_directory(opt, "memory:myApp");
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 **Note:** in-memory databases are kept after closing a store; they have to be explicitly deleted or are automatically deleted if the creating process exists.
 
@@ -94,60 +128,67 @@ Typical applications are caching and using ObjectBox as an advanced in-memory da
 
 Setting a database to read-only access only.
 
-{% hint style="info" %}
+:::info
 Advanced Setting: Use previous commit
 
 Recommended to be used together with read-only mode to ensure no data is lost. Ignores the latest data snapshot (committed transaction state) and uses the previous snapshot instead. When used with care (e.g. backup the DB files first), this option may also recover data removed by the latest transaction. Defaults to false.
-{% endhint %}
+:::
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options.readOnly(true)
        .usePreviousCommit(true); 
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_readonly(opt, true);
 obx_opt_use_previous_commit(opt, true);
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ### File Mode
 
 Specify unix-style file permissions for database files. This parameter is ignored on Windows platforms.
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options.fileMode(0640); 
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_file_mode(opt, 0640);
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ### Maximum Resource Limits
 
 Several limitations regarding the resources of a Store can be specified.
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options
@@ -156,17 +197,19 @@ options
   .maxReaders(256);
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_max_db_size_in_kb(opt,4*1024*1024)
 obx_opt_max_data_size_in_kb(opt,3*1024*1024)
 obx_opt_max_readers(opt,256)
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 #### Maximum Database Size
 
@@ -178,9 +221,9 @@ This value can be changed, so increased or also decreased, each time when openin
 
 `maxDataSizeInKB` can be set to limit the actual storage of data, excluding system and metadata, in contrast to `maxDbSizeInKB`. Thus, it must be less than the maximum database size.&#x20;
 
-{% hint style="info" %}
+:::info
 This resource limitation tracker is more involved.  Only use this if a stricter, more accurate limit is required.
-{% endhint %}
+:::
 
 #### Maximum Number of Readers
 
@@ -188,11 +231,11 @@ A "Reader" is short for a thread involved in a read transaction. Readers are an 
 
 For highly concurrent setups (e.g. you are using ObjectBox on the server side) it may make sense to increase the number.
 
-{% hint style="info" %}
+:::info
 The internal default is currently 126. So when hitting this limit, try values around 200-500.\
 \
 Each thread that performed a read transaction and is still alive holds on to a reader slot. These slots only get vacated when the thread ends. Thus, be mindful with the number of active threads.
-{% endhint %}
+:::
 
 ### Consistency and Validation&#x20;
 
@@ -201,8 +244,9 @@ ObjectBox offers several maintenance checks for validation and consistency check
 * consistency check on (branch and leaf) database pages
 * validation over the key/value pairs to check
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cilkcpp
 obx::Options options(model);
 options
@@ -210,25 +254,27 @@ options
   .validateOnKV();
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_validate_on_open_pages(opt, 1, OBXValidateOnOpenPagesFlags_VisitLeafPages); 
 obx_opt_validate_on_open_kv(opt, OBXValidateOnOpenKvFlags_None);
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 `validateOnOpenPages` enables a consistency check on the given amount of pages.  To completely disable this test you can pass 0, but we recommend a setting of at least 1. Optional flag `VisitLeafPages` enable validation of leaf pages (by default only branch pages are validated).&#x20;
 
-{% hint style="info" %}
+:::info
 Reliable file systems already guarantee consistency, so this is primarily meant to deal with unreliable OSes, file systems, or hardware. Thus, usually a low number (e.g. 1-20) is sufficient and does not impact startup performance significantly.\
 \
 **Note:** ObjectBox builds upon ACID storage, which guarantees consistency given that the file system is working correctly (in particular fsync).
-{% endhint %}
+:::
 
 `validateOnKV` enables validation over the key/value pairs to check, for example, whether they're consistent towards our internal specification. The flags argument is currently an empty enum (except None) for future improvments. &#x20;
 
@@ -236,23 +282,26 @@ Reliable file systems already guarantee consistency, so this is primarily meant 
 
 Fine-tune asynchronous operations using functions prefixed with `obx_opt_async_` (C) and `Options::async` (C++).
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options.asyncMaxInTxDuration(1000);
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
-```
+</TabItem>
+<TabItem value="c" label="C">
+
+```c
 OBX_store_options* opt = obx_opt();
 obx_opt_async_max_in_tx_duration(opt, 1000);
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 Available options for fine-tuning asynchronous operations:
 
@@ -272,10 +321,11 @@ Available options for fine-tuning asynchronous operations:
 
 ### Debug Flags
 
-When debugging or fine-tuning performance you can enable [logging](dev-tools-and-debugging.md#logging) of various events at the info level.
+When debugging or fine-tuning performance you can enable [logging](dev-tools-and-debugging#logging) of various events at the info level.
 
-{% tabs %}
-{% tab title="C++" %}
+<Tabs>
+<TabItem value="cpp" label="C++">
+
 ```cpp
 obx::Options options(model);
 options.addDebugFlags(
@@ -284,25 +334,26 @@ options.addDebugFlags(
 );
 obx::Store store(options);
 ```
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```c
 OBX_store_options* opt = obx_opt();
 obx_opt_add_debug_flags(opt, OBXDebugFlags_LOG_TRANSACTIONS_READ
 | OBXDebugFlags_LOG_TRANSACTIONS_WRITE);
 obx_store_open(opt);
 ```
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 ## Using the Store
 
 Once you created the store, it gives you access to several ways to interact with the data you store in it; aka the database:
 
-* [**Box API**](getting-started.md#working-with-object-boxes)**:** easy to use object-based API with implicit transactions. It is used in combination with the ObjectBox Generator, which generates the source code for data and Box classes. Check the getting started track for examples.
-* [**Query API**](queries.md)**:** In combination with the Box API, you can build powerful queries using the query builder. Once built, query instances can be executed multiple times to retrieve data.&#x20;
-* [**Explicit Transactions**](transactions.md)**:** Often it's a good idea to group several operations into a single "batch", or more precisely, one transaction. Batched transactions are not only faster, but also consider safe state changes for your data.
-
+* [**Box API**](getting-started#working-with-object-boxes)**:** easy to use object-based API with implicit transactions. It is used in combination with the ObjectBox Generator, which generates the source code for data and Box classes. Check the getting started track for examples.
+* [**Query API**](queries)**:** In combination with the Box API, you can build powerful queries using the query builder. Once built, query instances can be executed multiple times to retrieve data.&#x20;
+* [**Explicit Transactions**](transactions)**:** Often it's a good idea to group several operations into a single "batch", or more precisely, one transaction. Batched transactions are not only faster, but also consider safe state changes for your data.
 
 

@@ -1,10 +1,36 @@
 ---
-description: >-
-  ObjectBox database persistence for C and C++ is based on objects. Learn how to
-  persist entities with entity annotations in this tutorial section.
+title: "Entity Annotations in ObjectBox C++"
+description: "ObjectBox database persistence for C and C++ is based on objects. Learn how to persist entities with entity annotations in this tutorial section."
+keywords:
+  - objectbox
+  - c++
+  - cpp
+  - cmake
+  - database
+  - entities
 ---
 
+
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
+
+import { TechnicalArticleSchema } from '@site/src/components/Schema';
+
+<TechnicalArticleSchema
+  headline="Entity Annotations in ObjectBox C++"
+  description="ObjectBox database persistence for C and C++ is based on objects. Learn how to persist entities with entity annotations in this tutorial section."
+  url="https://cpp.objectbox.io/entity-annotations"
+  datePublished="2025-07-21"
+  dateModified="2025-07-21"
+/>
+
 # Entity Annotations
+
+ObjectBox database persistence for C and C++ is based on objects. Learn how to persist entities with entity annotations in this tutorial section.
+
 
 The source FlatBuffer schema can contain some ObjectBox-specific annotations, declared as specially formatted comments to `table` and `field` FlatBuffer schema elements.&#x20;
 
@@ -12,8 +38,7 @@ The source FlatBuffer schema can contain some ObjectBox-specific annotations, de
 
 Have a look at the following FlatBuffers schema example showing some ObjectBox annotations:
 
-{% code title="schema.fbs" %}
-```
+```fbs title="schema.fbs"
 /// This entity is not annotated and serves as a relation target in this example
 table Simple {
     id:ulong;
@@ -48,19 +73,11 @@ table SharedInfo {
     ...
 }
 ```
-{% endcode %}
 
 ## Annotation format
-
 To ensure that the annotations are recognized, follow these guidelines:
 
-* Must be a comment immediately preceding an Entity or a Property (no empty lines between them).
-* The comment must start with three slashes so it's picked up by FlatBuffer schema parser as a "documentation".
-* Spaces between words inside the comment are skipped so you can use them for better readability if you like. See e.g. `Annotated`, `time`.
-* The comment must start with the text `objectbox:` and is followed by one or more annotations, separated by commas.
-* Each annotation has a name and some annotations also support specifying a value (some even require a value, e.g. the `name` annotation). See e.g. `Annotated`, `relId`.
-* Value, if present, is added to the annotation by adding an equal sign and the actual value.
-* A value may additionally be surrounded by double quotes but it's not necessary. See e.g. `fullName` showing both variants.
+
 
 ## Supported annotations
 
@@ -70,10 +87,10 @@ The following annotations are currently supported:
 
 * **name** - specifies the name to use in the database if it's desired to be different than what the FlatBuffer schema "table" is called.
 * **transient** - this entity is skipped, no code is generated for it. Useful if you have custom FlatBuffer handling but still want to generate ObjectBox binding code for some parts of the same file.
-* **uid** - used to explicitly specify UID used with this entity; used when renaming entities. See [Schema changes](schema-changes.md) for more details.
+* **uid** - used to explicitly specify UID used with this entity; used when renaming entities. See [Schema changes](schema-changes) for more details.
 * **relation** - adds a standalone (many-to-many) relation, usually to another entity. Example: creating a relation to the authors of a book: `objectbox:relation(name=authors,to=Author)`
 * **sync** - enables synchronization for the entity - only relevant with [ObjectBox Sync](https://objectbox.io/sync/) library builds. Entities not marked with this annotation will not be synchronized to the server, i.e. they're local-only.
-  * `sync(sharedGlobalIds)` can be used to switch from the default behaviour (ID-mapping) to using a global ID space. This flag tells ObjectBox to treat object IDs globally and thus no ID mapping (local <-> global) is performed. Often this is used with `id(assignable)` annotation and some special ID scheme.
+  * `sync(sharedGlobalIds)` can be used to switch from the default behaviour (ID-mapping) to using a global ID space. This flag tells ObjectBox to treat object IDs globally and thus no ID mapping (local `<->` global) is performed. Often this is used with `id(assignable)` annotation and some special ID scheme.
 
 ### **Property annotations**
 
@@ -90,5 +107,5 @@ The following annotations are currently supported:
 * **relation** - declares the field as a relation ID, linking to another Entity which must be specified as a value of this annotation.
 * **name** - specifies the name to use in the database if it's desired to be different than what the FlatBuffer schema "field" is called.
 * **transient** - this property is skipped, no code is generated for it. Useful if you have custom FlatBuffer handling but still want to generate ObjectBox binding code for the entity.
-* **uid** - used to explicitly specify UID used with this property; used when renaming properties. See [Schema changes](schema-changes.md) for more details.
+* **uid** - used to explicitly specify UID used with this property; used when renaming properties. See [Schema changes](schema-changes) for more details.
 * **unique** - set to enforce that values are unique before an entity is inserted/updated. A `put` operation will abort and return an error if the unique constraint is violated.

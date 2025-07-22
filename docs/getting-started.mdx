@@ -1,24 +1,48 @@
 ---
-description: >-
-  ObjectBox Generator produces binding code for ObjectBox C & C++ APIs. This
-  greatly simplifies the model declaration and FlatBuffers serialization,
-  allowing you to concentrate on the application logic.
+title: "Getting Started with ObjectBox C++"
+description: "ObjectBox Generator produces binding code for ObjectBox C & C++ APIs. This greatly simplifies the model declaration and FlatBuffers serialization, allowing y..."
+keywords:
+  - objectbox
+  - c++
+  - cpp
+  - cmake
+  - database
+  - tutorial
 ---
+
+
+import Tabs from "@theme/Tabs"
+import TabItem from "@theme/TabItem"
+
+
+
+
+import { TechnicalArticleSchema } from '@site/src/components/Schema';
+
+<TechnicalArticleSchema
+  headline="Getting Started with ObjectBox C++"
+  description="ObjectBox Generator produces binding code for ObjectBox C & C++ APIs. This greatly simplifies the model declaration and FlatBuffers serialization, allowing y..."
+  url="https://cpp.objectbox.io/getting-started"
+  datePublished="2025-07-21"
+  dateModified="2025-07-21"
+/>
 
 # How to get started
 
+ObjectBox Generator produces binding code for ObjectBox C & C++ APIs. This greatly simplifies the model declaration and FlatBuffers serialization, allowing you to concentrate on the application logic.
+
+
 ### Generating binding code
 
-{% hint style="info" %}
-ObjectBox Generator is a tool, which must be [downloaded separately](https://github.com/objectbox/objectbox-generator/releases). For details, please check the [installation](installation.md) page.
-{% endhint %}
+:::info
+ObjectBox Generator is a tool, which must be [downloaded separately](https://github.com/objectbox/objectbox-generator/releases). For details, please check the [installation](installation) page.
+:::
 
 ObjectBox Generator uses FlatBuffer schema file (.fbs) as its primary input. The Generator also maintains some metadata around the data model in a JSON file (objectbox-model.json). Based on these two files, it generates code for the selected language (C or C++).&#x20;
 
 Let’s have a look at a sample schema and how Generator helps us.
 
-{% code title="tasklist.fbs" %}
-```
+```fbs title="tasklist.fbs"
 table Task {
     id: ulong;
     text: string;
@@ -26,12 +50,12 @@ table Task {
     date_finished: ulong;
 }
 ```
-{% endcode %}
 
 Use CMake or launch the following command to generate the binding code from the FlatBuffers schema file:
 
-{% tabs %}
-{% tab title="CMake (C++)" %}
+<Tabs>
+<TabItem value="cmakecpp" label="CMake (C++)">
+
 ```cmake
 find_package(ObjectBoxGenerator 4.0.0 REQUIRED)
 add_obx_schema(TARGET myapp SCHEMA_FILES tasklist.fbs INSOURCE)
@@ -44,12 +68,13 @@ The following files will be generated:
 * tasklist.obx.hpp
 * tasklist.obx.cpp
 
-{% hint style="info" %}
-See [#cmake-support](generator.md#cmake-support "mention")for details on CMake integration.
-{% endhint %}
-{% endtab %}
+:::info
+See [#cmake-support](generator#cmake-integration)for details on CMake integration.
+:::
 
-{% tab title="C++" %}
+</TabItem>
+<TabItem value="cpp" label="C++">
+
 ```sh
 # to generate for a single file
 objectbox-generator -cpp tasklist.fbs
@@ -64,9 +89,10 @@ The following files will be generated:
 * objectbox-model.json
 * tasklist.obx.hpp
 * tasklist.obx.cpp
-{% endtab %}
 
-{% tab title="C" %}
+</TabItem>
+<TabItem value="c" label="C">
+
 ```sh
 # to generate for a single file
 objectbox-generator -c tasklist.fbs
@@ -80,12 +106,13 @@ The following files will be generated:
 * objectbox-model.h
 * objectbox-model.json
 * tasklist.obx.h
-{% endtab %}
-{% endtabs %}
 
-{% hint style="warning" %}
+</TabItem>
+</Tabs>
+
+:::warning
 You should add all these generated files to your source control (e.g. git), most importantly  `objectbox-model.json` which ensures compatibility with previous versions of your database after you make changes to the schema.
-{% endhint %}
+:::
 
 ### Working with Object Boxes
 
@@ -95,10 +122,10 @@ From an ObjectBox Store, you get Box instances to manage your entities. While yo
 
 Now, you can include the generated headers in your application and start working with your database. Consider the following main file:
 
-{% tabs %}
-{% tab title="C++" %}
-{% code title="main.cpp" %}
-```cpp
+<Tabs>
+<TabItem value="cpp" label="C++">
+
+```cpp title="main.cpp"
 #define OBX_CPP_FILE
 #include "objectbox.hpp"
 #include "objectbox-model.h"
@@ -120,18 +147,17 @@ int main(int argc, char* args[]) {
     return 0;
 }
 ```
-{% endcode %}
 
-{% hint style="info" %}
+:::info
 It's required to have **exactly one .cpp file** in your project that defines OBX\_CPP\_FILE right before the inclusion of the "objectbox.hpp" header.
 
 This `#define` instructs the "objectbox.hpp" header to emit implementation definitions. If you accidentally have it in multiple files, the linker will complain about multiple symbols (having the same name).
-{% endhint %}
-{% endtab %}
+:::
 
-{% tab title="C" %}
-{% code title="main.c" %}
-```c
+</TabItem>
+<TabItem value="c" label="C">
+
+```c title="main.c"
 #include "objectbox.h"
 #include "objectbox-model.h"
 #include "tasklist.obx.h"
@@ -218,13 +244,13 @@ handle_error:  // print error and clean up
     goto free_resources;
 }
 ```
-{% endcode %}
-{% endtab %}
-{% endtabs %}
+
+</TabItem>
+</Tabs>
 
 If you've followed the installation instructions, you should be able to compile the example
 
-If you are using CMake, like shown in the [installation section](installation.md#cmake-3.14),  just add the generated `tasklist.obx.cpp` file to the `myapp`  target.
+If you are using CMake, like shown in the [installation section](installation#cmake-3.14),  just add the generated `tasklist.obx.cpp` file to the `myapp`  target.
 
 The `add_executable` call in the CMake file now looks like this:
 
@@ -236,22 +262,26 @@ The rest of the CMakeLists.txt file stays unchanged. You can now use CMake as ex
 
 If you use _a build system other than CMake_, it has to do the proper action so the generated file is added to the build.&#x20;
 
-{% tabs %}
-{% tab title="C++" %}
-<pre class="language-bash"><code class="lang-bash"><strong>g++ main.cpp tasklist.obx.cpp -I. -std=c++11 -lobjectbox
-</strong></code></pre>
-{% endtab %}
+<Tabs>
+<TabItem value="cpp" label="C++">
 
-{% tab title="C" %}
+```bash
+g++ main.cpp tasklist.obx.cpp -I. -std=c++11 -lobjectbox
+```
+
+</TabItem>
+<TabItem value="c" label="C">
+
 ```bash
 gcc main.c -I. -lobjectbox -lflatccrt
 ```
-{% endtab %}
-{% endtabs %}
 
-{% hint style="info" %}
-The command snippet assumes you have [the libraries installed](installation.md) in a path recognized by your OS (e.g. /usr/local/lib/) and all the referenced headers are in the same folder alongside the main.c/.cpp file.
-{% endhint %}
+</TabItem>
+</Tabs>
+
+:::info
+The command snippet assumes you have [the libraries installed](installation) in a path recognized by your OS (e.g. /usr/local/lib/) and all the referenced headers are in the same folder alongside the main.c/.cpp file.
+:::
 
 Wherever you have access to a Box, you can use it to persist objects and fetch objects from disk. **Boxes are thread-safe.** Here are some of the basic operations, have a look at the objectbox.h(pp) for more:
 
