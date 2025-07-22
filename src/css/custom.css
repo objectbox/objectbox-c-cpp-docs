@@ -292,7 +292,7 @@ div[role="tabpanel"] {
   border-top: 0px solid var(--objectbox-grey-border) !important;
   border-bottom: 1px solid var(--objectbox-grey-border) !important;
   border-radius: 0 0 6px 6px !important;
-  /background-color: rgb(255, 255, 255) !important;
+  /*background-color: rgb(255, 255, 255) !important;*/
   /*background-color: rgb(152, 231, 27) !important; /* DEBUG */
   padding: 20px !important;
   /*margin: 0 !important; we also tried margin-top, but this did not influence the missing line between the tab header and the actual tab*/
@@ -917,4 +917,3 @@ div[class*="docPage"] {
    /*  outline: 30px solid rgb(255, 98, 0) !important;*/
   }
 }
-
