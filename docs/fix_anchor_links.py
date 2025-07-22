@@ -207,7 +207,7 @@ def fix_anchor_in_url(url_with_anchor: str, all_headings: Dict[str, Dict[str, st
         # C++ specific anchors
         'cmake-support': 'cmake-integration',
         'cmake-3.14': 'objectbox-library',
-        'reset-data-new-uid-on-a-property': 'reset-data-new-uid-on-a-property',
+        'reset-data-new-uid-on-a-property': 'reset-data---new-uid-on-a-property',
         'standalone': 'using-the-standalone-generator',
     }
     
