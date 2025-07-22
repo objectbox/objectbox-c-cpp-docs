@@ -8,10 +8,10 @@ The **text content** is written in the markdown format and the [docs](docs/) fol
 
 Other resources:
 
-* **Images** are places in the [static/img/assets/](static/img/assets/) folder.
+* **Images** are placed in the [static/img/assets/](static/img/assets/) folder.
 * The **main navigation** is located in the [sidebars.ts](sidebars.ts) file.
 * The main **configuration** is done in the [docusaurus.config.ts](docusaurus.config.ts) file.
-* CSS styles are written in the [src/css/custom.css](src/css/custom.css) file.
+* Custom **CSS styles** to overwrite the theme's default are located in the [src/css/custom.css](src/css/custom.css) file.
 
 Notes regarding image file names: only use lowercase and no spaces.
 

@@ -91,7 +91,7 @@ endif()
 
 add_executable(myapp main.cpp)
 target_link_libraries(myapp objectbox)
-```cmake
+```
 If you want to integrate the ObjectBox-Generator via CMake (as an alternative to offline installation and pre-generation of C++ sources), use the following snippet:
 
 ```cmake
@@ -105,9 +105,8 @@ add_obx_schema(
   INSOURCE # Opt-in: Generate in source directory
   CXX_STANDARD 11 # Defaults to C++14 otherwise
 )
-```cmake
-\
-If you want to use an ObjectBox Sync variant of the library, change the list line to:&#x20;
+```
+If you want to use an ObjectBox Sync variant of the library, change the `target_link_libraries` to:&#x20;
 
 ```cmake title="CMakeLists.txt"
 target_link_libraries(myapp objectbox-sync)
