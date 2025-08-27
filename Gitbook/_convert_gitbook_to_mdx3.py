@@ -6,6 +6,10 @@ from pathlib import Path
 
 print("Script starting...NEW SCRIPT 30.06.2025 14:33 - DEBUG ENHANCED")  # Debug print
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+OUTPUT_ROOT = os.path.join(PROJECT_ROOT, 'website', 'docs')
+
 def ensure_valid_frontmatter(content):
     """Ensure the file has valid frontmatter."""
     if content.startswith('---\n'):
@@ -20,15 +24,42 @@ def ensure_valid_frontmatter(content):
             return frontmatter + content
     return content
 
-def find_docs_files(directory='.'):
-    """Find all .md and .mdx files in the given directory, excluding website/docs."""
+def find_docs_files_recursive(directory='.'):
+    """Find all .md and .mdx files recursively in the given directory and subdirectories, excluding website/docs."""
+    print(f"[DEBUG] FOLDER FIX: Searching recursively in directory: {directory}")
     all_files = []
     for ext in ['*.md', '*.mdx']:
-        files = glob.glob(os.path.join(directory, ext))
+        # Use ** for recursive search
+        pattern = os.path.join(directory, '**', ext)
+        files = glob.glob(pattern, recursive=True)
+        print(f"[DEBUG] FOLDER FIX: Found {len(files)} {ext} files with pattern {pattern}")
         # Filter out files from website/docs directory
-        files = [f for f in files if not f.startswith(os.path.join('website', 'docs'))]
+        files = [f for f in files if not f.startswith(os.path.join('website', 'docs')) and 'website' not in f]
+        print(f"[DEBUG] FOLDER FIX: After filtering, {len(files)} files remain")
         all_files.extend(files)
+    
+    print(f"[DEBUG] FOLDER FIX: Total files found: {len(all_files)}")
+    for file in all_files:
+        print(f"[DEBUG] FOLDER FIX: - {file}")
+    
     return all_files
+
+def get_output_path(input_file, source_dir='.', output_dir='../website/docs'):
+    """Generate output path maintaining folder structure."""
+    # Get relative path from source directory
+    rel_path = os.path.relpath(input_file, source_dir)
+    
+    # Change extension to .mdx
+    if rel_path.endswith('.md'):
+        rel_path = rel_path[:-3] + '.mdx'
+    
+    # Combine with output directory
+    output_path = os.path.join(output_dir, rel_path)
+    
+    print(f"[DEBUG] FOLDER FIX: Input: {input_file} -> Output: {output_path}")
+    
+    return output_path
+
 
 def extract_yaml_frontmatter(lines):
     if lines and lines[0].strip() == '---':
@@ -117,7 +148,13 @@ def improved_escape_curly_braces(content):
     return '\n'.join(result)
 
 def fix_html_and_escape(content):
-    print("[DEBUG] fix_html_and_escape called")
+    """
+    Comprehensive HTML fixing for MDX compatibility.
+    This replaces the original fix_html_and_escape function.
+    """
+    import re
+    
+    print("[DEBUG] fix_html_and_escape called - COMPREHENSIVE VERSION")
     
     # Check for backticks in input
     backtick_count = content.count('`')
@@ -137,25 +174,136 @@ def fix_html_and_escape(content):
         return f'```{lang}\n{txt}\n```'
     content = re.sub(r'<pre([^>]*)><code([^>]*)>([\s\S]*?)</code></pre>', pre, content, flags=re.IGNORECASE)
 
-    # 3) Self-close img tags
-    content = re.sub(r'<img([^>]+?)(?<!/)>', r'<img\1/>', content)
+    # 3) Fix ALL unclosed HTML tags that need to be self-closed
+    print("[DEBUG] Fixing unclosed HTML tags...")
+    
+    # Fix <br> tags - make them self-closing
+    content = re.sub(r'<br(?!/>)', '<br/>', content)
+    print(f"[DEBUG] Fixed <br> tags")
+    
+    # Fix <img> tags - make them self-closing (improved regex)
+    content = re.sub(r'<img([^>]*?)(?<!/)>', r'<img\1/>', content)
+    print(f"[DEBUG] Fixed <img> tags")
+    
+    # Fix <hr> tags - make them self-closing
+    content = re.sub(r'<hr(?!\s*/>)(?![^>]*>)', '<hr/>', content)
+    print(f"[DEBUG] Fixed <hr> tags")
+    
+    # Fix <input> tags - make them self-closing
+    content = re.sub(r'<input([^>]*?)(?<!/)>', r'<input\1/>', content)
+    print(f"[DEBUG] Fixed <input> tags")
 
-    # 4) Convert figure+img to markdown
+    # 4) ENHANCED IMAGE PATH FIXES - Convert GitBook paths to Docusaurus paths
+    print("[DEBUG] ENHANCED IMAGE PATH FIXES: Converting GitBook image paths...")
+
+    # Fix markdown images with angle brackets and parent directory paths
+    content = re.sub(
+        r'!\[([^\]]*)\]\(<\.\./\.gitbook/assets/([^>]+)>\)', 
+        r'![\1](/img/assets/\2)', 
+        content
+    )
+    # Also handle without angle brackets for completeness
+    content = re.sub(
+        r'!\[([^\]]*)\]\(\.\./\.gitbook/assets/([^)]+)\)', 
+        r'![\1](/img/assets/\2)', 
+        content
+    )
+    print(f"[DEBUG] Fixed GitBook markdown images with ../ prefix")
+
+    # Fix markdown images with angle brackets and current directory paths  
+    content = re.sub(
+        r'!\[([^\]]*)\]\(<\.gitbook/assets/([^)>]+)>\)', 
+        r'![\1](/img/assets/\2)', 
+        content
+    )
+    print(f"[DEBUG] Fixed GitBook markdown images with current directory")
+
+    # Fix HTML img tags with parent directory paths
+    content = re.sub(
+        r'<img([^>]*?)src="<?\.\./\.gitbook/assets/([^">]+)>?"([^>]*?)/?>', 
+        r'<img\1src="/img/assets/\2"\3/>', 
+        content
+    )
+    print(f"[DEBUG] Fixed GitBook HTML img tags with ../ prefix")
+
+    # Keep existing patterns for backward compatibility
+    content = re.sub(
+        r'!\[([^\]]*)\]\((?:docs/|\.\./)\.gitbook/assets/([^)]+)\)', 
+        r'![\1](/img/assets/\2)', 
+        content
+    )
+    content = re.sub(
+        r'<img([^>]*?)src="(?:docs/|\.\./)\.gitbook/assets/([^"]+)"([^>]*?)/?>', 
+        r'<img\1src="/img/assets/\2"\3/>', 
+        content
+    )
+    content = re.sub(
+        r'<img([^>]*?)src="\.gitbook/assets/([^"]+)"([^>]*?)/?>', 
+        r'<img\1src="/img/assets/\2"\3/>', 
+        content
+    )
+
+    print(f"[DEBUG] Fixed .gitbook/assets image paths")
+
+    # Enhanced pattern to catch any remaining variants with optional angle brackets
+    content = re.sub(
+        r'!\[([^\]]*)\]\(\s*<?(?:\.?\.?/)*\.gitbook/assets/([^)>]+)>?\s*\)',
+        r'![\1](/img/assets/\2)',
+        content
+    )
+    content = re.sub(
+        r'<img([^>]*?)src=["\']<?(?:\.?\.?/)*\.gitbook/assets/([^"\'>\s]+)>?["\']([^>]*?)/?>',
+        r'<img\1src="/img/assets/\2"\3/>',
+        content
+    )
+
+    # 5) Convert figure+img to markdown (IMPROVED to prevent extra characters)
     def fig(m):
-        img = m.group(1)
-        src = (re.search(r'src="([^"]+)"', img) or [None, None])[1] or ''
-        alt = (re.search(r'alt="([^"]*)"', img) or [None, None])[1] or ''
-        return f'![{alt}]({src})'
-    content = re.sub(r'<figure>\s*(<img[^>]+>)\s*</figure>', fig, content, flags=re.IGNORECASE)
+        img_tag = m.group(1)
+        
+        # Extract src and alt attributes from the img tag
+        src_match = re.search(r'src="([^"]+)"', img_tag)
+        alt_match = re.search(r'alt="([^"]*)"', img_tag)
+        
+        src = src_match.group(1) if src_match else ''
+        alt = alt_match.group(1) if alt_match else ''
+        
+        # Fix the src path if it's a GitBook path
+        if '.gitbook/assets' in src:
+            # This handles paths like '.gitbook/assets/image.png'
+            src = f'/img/assets/{src.split("/")[-1]}'
+        elif 'gitbook/assets' in src:
+            # This handles paths like 'docs/.gitbook/assets/image.png'
+            src = re.sub(r'(?:docs/|\.\./)?\.gitbook/assets/', '/img/assets/', src)
 
-    # 5) Remove leftover HTML tags
-    content = re.sub(r'</?(?:figure|pre)>', '', content)
+        # Create a clean markdown image tag. This is the key change.
+        # It ensures no extra characters from the original <figure> tag are left behind.
+        return f'![{alt}]({src})'
+
+    # The regex now correctly captures only the <img> tag inside the <figure>
+    content = re.sub(r'<figure>\s*(<img[^>]+>)\s*(?:<figcaption>.*?</figcaption>)?\s*</figure>', fig, content, flags=re.IGNORECASE | re.DOTALL)
+
+    # 6) Remove leftover HTML tags (this might be redundant now but is safe to keep)
+    content = re.sub(r'</?(?:figure|figcaption)>', '', content)
+
+    # 7) Fix any remaining problematic HTML in tables
+    print("[DEBUG] Fixing table HTML...")
+    
+    # Fix span tags with GitBook custom attributes (convert to simple text)
+    content = re.sub(
+        r'<span data-gb-custom-inline[^>]*>([^<]*)</span>', 
+        r'\1', 
+        content
+    )
+    
+    # Fix figcaption tags (convert to simple text or remove)
+    content = re.sub(r'<figcaption[^>]*>(.*?)</figcaption>', r'*\1*', content, flags=re.DOTALL)
 
     # Check for backticks in output
     backtick_count_after = content.count('`')
     print(f"[DEBUG] BACKTICK: fix_html_and_escape output has {backtick_count_after} backticks (change: {backtick_count_after - backtick_count})")
     
-    print("[DEBUG] fix_html_and_escape completed (no brace escaping)")
+    print("[DEBUG] fix_html_and_escape completed - COMPREHENSIVE VERSION")
     return content
 
 def fix_gitbook_content_ref_to_cards(content):
@@ -229,30 +377,6 @@ def fix_gitbook_content_ref_to_cards(content):
         print("[DEBUG] SUCCESS: All GitBook content-ref blocks converted to styled cards")
     
     return result
-
-
-    
-    # Count content-ref blocks before conversion
-    content_refs = re.findall(content_ref_pattern, content, flags=re.DOTALL)
-    print(f"[DEBUG] Found {len(content_refs)} content-ref blocks to convert to cards")
-    
-    # Debug: Show what content-refs were found
-    for i, (url, text) in enumerate(content_refs):
-        print(f"[DEBUG] Content-ref {i+1}: url='{url}', text='{text}'")
-    
-    # Apply the conversion
-    result = re.sub(content_ref_pattern, content_ref_to_card, content, flags=re.DOTALL)
-    
-    # Check for any remaining GitBook content-ref patterns
-    remaining_refs = re.findall(r'{% content-ref|{% endcontent-ref %}', result)
-    if remaining_refs:
-        print(f"[DEBUG] WARNING: Found {len(remaining_refs)} unconverted content-ref elements")
-    else:
-        print("[DEBUG] SUCCESS: All GitBook content-ref blocks converted to cards")
-    
-    return result
-
-
 
 def enhanced_convert_gitbook_code_blocks_simple(content):
     """
@@ -424,11 +548,16 @@ def fix_all_remaining_gitbook_blocks(content):
     remaining_hints = re.findall(r'{% hint[^}]*%}.*?{% endhint %}', content, flags=re.DOTALL)
     remaining_tabs = re.findall(r'{% tabs %}.*?{% endtabs %}', content, flags=re.DOTALL)
     remaining_content_refs = re.findall(r'{% content-ref[^}]*%}.*?{% endcontent-ref %}', content, flags=re.DOTALL)
-    
+    remaining_page_refs = re.findall(r'{% page-ref[^}]*%}', content, flags=re.DOTALL)
+    remaining_file_blocks = re.findall(r'{% file[^}]*%}.*?{% endfile %}', content, flags=re.DOTALL)
+    print(f"NEW!!!!!!!!!!!!!!!!![DEBUG] Found {len(remaining_page_refs)} remaining page-ref blocks")
+    print("NEW!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("NEW!!!!!!!!!!!!!!!!!!!!!!!!!") 
     print(f"[DEBUG] Found {len(remaining_code_blocks)} remaining code blocks")
     print(f"[DEBUG] Found {len(remaining_hints)} remaining hint blocks")
     print(f"[DEBUG] Found {len(remaining_tabs)} remaining tab blocks")
     print(f"[DEBUG] Found {len(remaining_content_refs)} remaining content-ref blocks")
+    print(f"[DEBUG] Found {len(remaining_file_blocks)} remaining file blocks")
     
     # Fix remaining code blocks with simple conversion
     if remaining_code_blocks:
@@ -515,6 +644,17 @@ def fix_all_remaining_gitbook_blocks(content):
         
         content = re.sub(content_ref_pattern, content_ref_replace, content, flags=re.DOTALL)
     
+    # Fix remaining page-ref blocks
+    if remaining_page_refs:
+        print("[DEBUG] Converting remaining page-ref blocks...")
+        page_ref_pattern = r'{% page-ref page="([^"]*)" %}'
+        def page_ref_replace(match):
+            page_url = match.group(1)
+            clean_url = page_url[:-3] if page_url.endswith('.md') else page_url
+            link_text = clean_url.replace('-', ' ').title()
+            return f'[{link_text}]({clean_url})'
+        content = re.sub(page_ref_pattern, page_ref_replace, content, flags=re.DOTALL)
+    
     # Fix remaining tab blocks
     if remaining_tabs:
         print("[DEBUG] Converting remaining tab blocks...")
@@ -522,19 +662,83 @@ def fix_all_remaining_gitbook_blocks(content):
         for i, block in enumerate(remaining_tabs[:3]):
             print(f"[DEBUG] Remaining tab block {i+1}: {block[:100]}...")
     
-    # Final check
+    # Final check and cleanup
     final_remaining = re.findall(r'{% [^}]*%}', content)
     if final_remaining:
         print(f"[DEBUG] WARNING: Still have {len(final_remaining)} GitBook patterns after cleanup")
         for i, pattern in enumerate(final_remaining[:5]):
             print(f"[DEBUG] Still remaining {i+1}: {pattern}")
+        # Remove any remaining GitBook patterns to prevent MDX parsing errors
+        content = re.sub(r'{% [^}]*%}', '', content)
+        print("[DEBUG] Removed all remaining GitBook patterns")
     else:
         print("[DEBUG] SUCCESS: All GitBook patterns cleaned up!")
     
     return content
 
-
-
+def fix_gitbook_embed_blocks(content):
+    """
+    Convert GitBook embed blocks to proper markdown links.
+    This function should be added to the conversion script.
+    """
+    import re
+    
+    print("[DEBUG] fix_gitbook_embed_blocks called")
+    
+    # Pattern to match GitBook embed blocks: {% embed url="..." %}
+    embed_pattern = r'{% embed url="([^"]*)" %}'
+    
+    # Pattern to match {% endembed %} tags (standalone)
+    endembed_pattern = r'{% endembed %}'
+    
+    def embed_replace(match):
+        url = match.group(1)
+        
+        print(f"[DEBUG] Converting embed block: {url}")
+        
+        # Create a descriptive link text based on the URL
+        if 'vector-search' in url:
+            link_text = 'Learn more about On-Device Vector Search'
+        elif 'sync' in url:
+            link_text = 'Learn more about Data Sync'
+        elif 'getting-started' in url:
+            link_text = 'Getting Started Guide'
+        else:
+            # Extract a reasonable link text from the URL
+            path_parts = url.split('/')
+            if path_parts:
+                link_text = path_parts[-1].replace('-', ' ').title()
+            else:
+                link_text = 'Learn more'
+        
+        result = f'[{link_text}]({url})'
+        print(f"[DEBUG] Converted embed to: {result}")
+        return result
+    
+    # Count embed blocks before conversion
+    embed_blocks = re.findall(embed_pattern, content)
+    endembed_blocks = re.findall(endembed_pattern, content)
+    print(f"[DEBUG] Found {len(embed_blocks)} embed blocks to convert")
+    print(f"[DEBUG] Found {len(endembed_blocks)} endembed blocks to remove")
+    
+    # Debug: Show what embed blocks were found
+    for i, url in enumerate(embed_blocks):
+        print(f"[DEBUG] Embed block {i+1}: {url}")
+    
+    # Apply the conversion
+    result = re.sub(embed_pattern, embed_replace, content)
+    
+    # Remove standalone {% endembed %} tags
+    result = re.sub(endembed_pattern, '', result)
+    
+    # Check for any remaining embed blocks
+    remaining_embeds = re.findall(r'{% embed|{% endembed', result)
+    if remaining_embeds:
+        print(f"[DEBUG] WARNING: Found {len(remaining_embeds)} unconverted embed blocks")
+    else:
+        print("[DEBUG] SUCCESS: All GitBook embed blocks converted")
+    
+    return result
 
 def extract_description_from_frontmatter(content):
     """
@@ -726,8 +930,9 @@ def fix_mdx_list_dash(content):
 
 def fix_mdx_problematic_characters(content):
     """
-    Fix characters like <->, <-, << that MDX interprets as JSX syntax.
+    Fix characters like <->, <-, <<, <--> that MDX interprets as JSX syntax.
     IMPORTANT: Skip frontmatter sections to avoid corrupting YAML.
+    ENHANCED: Added <--> pattern detection and fixing.
     """
     import re
     
@@ -747,14 +952,16 @@ def fix_mdx_problematic_characters(content):
                 frontmatter_end = i
                 break
     
-    # Count patterns before fixing
+    # Count patterns before fixing (ENHANCED: Added <--> pattern)
     original_arrow_patterns = len(re.findall(r'<->', content))
     original_left_arrow_patterns = len(re.findall(r'<-(?!>)', content))
     original_double_left_patterns = len(re.findall(r'<<', content))
+    original_double_arrow_patterns = len(re.findall(r'<-->', content))  # NEW: <--> pattern
     
     print(f"[DEBUG] Found {original_arrow_patterns} '<->' patterns")
     print(f"[DEBUG] Found {original_left_arrow_patterns} '<-' patterns")
     print(f"[DEBUG] Found {original_double_left_patterns} '<<' patterns")
+    print(f"[DEBUG] Found {original_double_arrow_patterns} '<-->' patterns")  # NEW: Debug for <-->
     
     # Process lines, skipping frontmatter
     fixed_lines = []
@@ -769,6 +976,11 @@ def fix_mdx_problematic_characters(content):
         
         # Fix problematic characters in non-frontmatter lines
         original_line = line
+        
+        # NEW: Fix <--> patterns FIRST (before <-> patterns to avoid conflicts)
+        if '<-->' in line:
+            line = re.sub(r'<-->', '`<-->`', line)
+            print(f"[DEBUG] Fixed <--> pattern in line {i+1}")
         
         # Fix <-> patterns (bidirectional arrows)
         line = re.sub(r'<->', '`<->`', line)
@@ -787,14 +999,16 @@ def fix_mdx_problematic_characters(content):
     
     result = '\n'.join(fixed_lines)
     
-    # Count patterns after fixing
+    # Count patterns after fixing (ENHANCED: Added <--> pattern)
     remaining_arrow_patterns = len(re.findall(r'<->', result))
     remaining_left_arrow_patterns = len(re.findall(r'<-(?!>)', result))
     remaining_double_left_patterns = len(re.findall(r'<<', result))
+    remaining_double_arrow_patterns = len(re.findall(r'<-->', result))  # NEW: <--> pattern
     
     print(f"[DEBUG] After fixing: {remaining_arrow_patterns} '<->' patterns remain")
     print(f"[DEBUG] After fixing: {remaining_left_arrow_patterns} '<-' patterns remain")
     print(f"[DEBUG] After fixing: {remaining_double_left_patterns} '<<' patterns remain")
+    print(f"[DEBUG] After fixing: {remaining_double_arrow_patterns} '<-->' patterns remain")  # NEW: Debug for <-->
     
     if frontmatter_start != -1 and frontmatter_end != -1:
         print(f"[DEBUG] Skipped frontmatter lines {frontmatter_start+1}-{frontmatter_end+1} to preserve YAML")
@@ -897,7 +1111,7 @@ def convert_gitbook_tabs(content):
         print(f"[DEBUG] Fixing code blocks in tab with language context: {language_context}")
         
         # Pattern to find empty code blocks (no language specified)
-        empty_code_pattern = r'```\s*\n(.*?)\n```'
+        empty_code_pattern = r'```\s*\n([^`]+?)\n```'
         
         def replace_empty_code_block(match):
             code_content = match.group(1)
@@ -1004,7 +1218,6 @@ def convert_gitbook_tabs(content):
     print("[DEBUG] convert_gitbook_tabs completed")
     return result
 
-
 def fix_text_code_blocks(content):
     """
     Fix code blocks that were converted to 'text' language by detecting the actual language.
@@ -1077,42 +1290,6 @@ def fix_text_code_blocks(content):
     
     return result
 
-
-    
-    # Count BOTH types of problematic blocks before conversion
-    text_blocks = re.findall(text_block_pattern, content, flags=re.DOTALL | re.MULTILINE)
-    empty_blocks = re.findall(empty_block_pattern, content, flags=re.DOTALL | re.MULTILINE)
-    
-    print(f"[DEBUG] Found {len(text_blocks)} ```text code blocks to fix")
-    print(f"[DEBUG] Found {len(empty_blocks)} empty ``` code blocks to fix")
-    
-    # Debug: Show what blocks were found
-    for i, block in enumerate(text_blocks):
-        print(f"[DEBUG] Text block {i+1}: {block.strip()[:50]}...")
-    
-    for i, block in enumerate(empty_blocks):
-        print(f"[DEBUG] Empty block {i+1}: {block.strip()[:50]}...")
-    
-    # Apply conversions for BOTH patterns
-    # First fix ```text blocks
-    result = re.sub(text_block_pattern, detect_language_and_replace, content, flags=re.DOTALL | re.MULTILINE)
-    
-    # Then fix empty ``` blocks
-    result = re.sub(empty_block_pattern, detect_language_and_replace, result, flags=re.DOTALL | re.MULTILINE)
-    
-    # Count remaining problematic blocks
-    remaining_text_blocks = re.findall(r'^```text\s*\n', result, flags=re.MULTILINE)
-    remaining_empty_blocks = re.findall(r'^```\s*\n', result, flags=re.MULTILINE)
-    
-    print(f"[DEBUG] {len(remaining_text_blocks)} ```text blocks remain after conversion")
-    print(f"[DEBUG] {len(remaining_empty_blocks)} empty ``` blocks remain after conversion")
-    
-    total_fixed = len(text_blocks) + len(empty_blocks) - len(remaining_text_blocks) - len(remaining_empty_blocks)
-    if total_fixed > 0:
-        print(f"[DEBUG] Successfully converted {total_fixed} code blocks to proper languages")
-    
-    return result
-
 def fix_internal_links(content):
     """
     Fix internal links that still point to .md files.
@@ -1124,7 +1301,7 @@ def fix_internal_links(content):
     
     # Pattern to find markdown links that point to .md files
     # Matches: [text](file.md) or [text](file.md#anchor)
-    md_link_pattern = r'\[([^\]]*)\]\(([^)]*\.md(?:#[^)]*)?)\)'
+    md_link_pattern = r'\[([^\]]*)\]\(([^)]*\.md(?:#[^)]*)?)[^)]*\)'
     
     def fix_link(match):
         link_text = match.group(1)
@@ -1171,9 +1348,6 @@ def fix_internal_links(content):
         print(f"[DEBUG] Successfully fixed {len(md_links) - len(remaining_md_links)} internal links")
     
     return result
-
-
-
 
 def fix_frontmatter_structure(content):
     """
@@ -1266,18 +1440,19 @@ def fix_frontmatter_structure(content):
     
     return result
 
-
-def convert_file(input_file, output_file=None):  # Make output_file optional
-    # FIXED: Don't use the passed output_file, determine it ourselves
-    filename = os.path.basename(input_file)
+def convert_file(input_file):
+    """Convert a single file from GitBook MD to Docusaurus MDX."""
+    print(f"[DEBUG] FOLDER FIX: Converting file: {input_file}")
     
-    # ALWAYS create .mdx files (simplifies logic)
-    if filename.endswith('.md'):
-        filename = filename[:-3] + '.mdx'
+    # Generate output path maintaining folder structure
+    output_path = get_output_path(input_file, BASE_DIR, OUTPUT_ROOT)
     
-    out = os.path.join('website', 'docs', filename)
+    # Create output directory if it doesn't exist
+    output_dir = os.path.dirname(output_path)
+    os.makedirs(output_dir, exist_ok=True)
+    print(f"[DEBUG] FOLDER FIX: Created directory: {output_dir}")
     
-    print(f'Converting {input_file} to {out}')  # FIXED: Show correct output path
+    print(f'Converting {input_file} to {output_path}')
     
     with open(input_file, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -1285,10 +1460,6 @@ def convert_file(input_file, output_file=None):  # Make output_file optional
     print(f"[DEBUG] BACKTICK: Initial file content has {content.count('`')} backticks")
     
     content = ensure_valid_frontmatter(content)
-
-    # print("[DEBUG] Step 0: Fix frontmatter structure")
-    # content = fix_frontmatter_structure(content)
-
     
     # FIXED ORDER: Code blocks FIRST, then escaping
     print("[DEBUG] Step 1: HTML fixes")
@@ -1320,9 +1491,15 @@ def convert_file(input_file, output_file=None):  # Make output_file optional
 
     print("[DEBUG] Step 9: Fix remaining GitBook blocks")
     content = fix_all_remaining_gitbook_blocks(content)
-    
+
+    print("[DEBUG] Step 9.5: Fix GitBook embed blocks")
+    content = fix_gitbook_embed_blocks(content)
+
     print("[DEBUG] Step 10: Fix MDX problematic characters")
     content = fix_mdx_problematic_characters(content)
+
+    print("[DEBUG] Step 10.5: Fix internal links")
+    content = fix_internal_links(content)
     
     print(f"[DEBUG] BACKTICK: Final content before JSX imports has {content.count('`')} backticks")
     
@@ -1336,7 +1513,7 @@ def convert_file(input_file, output_file=None):  # Make output_file optional
     content = fix_frontmatter_structure(content)
 
     print(f"[DEBUG] BACKTICK: Final content after JSX imports has {content.count('`')} backticks")
-    print(f"[DEBUG] Output: {out} (JSX detected: {has_jsx})")
+    print(f"[DEBUG] Output: {output_path} (JSX detected: {has_jsx})")
 
     print("[DEBUG] Step 12: Extract description from frontmatter")
     content = extract_description_from_frontmatter(content)
@@ -1352,26 +1529,29 @@ def convert_file(input_file, output_file=None):  # Make output_file optional
 
     print("[DEBUG] Step 16: Fix text code blocks") 
     content = fix_text_code_blocks(content)
-
-    print("[DEBUG] Step 17: Fix internal links")
-    content = fix_internal_links(content)
-
     
     # Check for problematic backticks in JSX attributes before writing
     lines = content.splitlines()
     for line_num, line in enumerate(lines, 1):
         if 'className=' in line and '`' in line:
             print(f"[DEBUG] BACKTICK: WARNING - Line {line_num} has backticks near className: {line.strip()}")
-    
-    with open(out, 'w', encoding='utf-8') as f:
-        f.write(content)
+
+    try:
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"[DEBUG] FOLDER FIX: Successfully wrote file: {output_path}")
+    except Exception as e:
+        print(f"[DEBUG] FOLDER FIX: ERROR writing file {output_path}: {e}")
+
         
 def main():
     """Main function to process all markdown files."""
     print("Starting GitBook to MDX conversion...")
     
     # Find all .md files in current directory (excluding website/docs)
-    md_files = find_docs_files('.')
+    md_files = find_docs_files_recursive(BASE_DIR)
+
+
     
     if not md_files:
         print("No .md files found in current directory")
@@ -1380,9 +1560,6 @@ def main():
     print(f"Found {len(md_files)} files to process:")
     for file in md_files:
         print(f"  - {file}")
-    
-    # Create output directory
-    os.makedirs('website/docs', exist_ok=True)
     
     # Process each file - LET convert_file determine the output path
     for input_file in md_files:
@@ -1396,4 +1573,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
