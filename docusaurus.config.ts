@@ -8,72 +8,59 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   url: 'https://cpp.objectbox.io',
-    /*baseUrl: '/',*/
   baseUrl: '/',
 
-  organizationName: 'objectbox', 
+  organizationName: 'objectbox',
   projectName: 'objectbox-c-cpp-docs',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
-  },
+  i18n: { defaultLocale: 'en', locales: ['en'] },
 
   themes: [
     [
-     '@easyops-cn/docusaurus-search-local',
-    {
-      hashed: true,
-      language: ['en'],
-      highlightSearchTermsOnTargetPage: true,
-      explicitSearchResultPath: false,  // Changed from true - this can cause 404s
-      indexDocs: true,
-      indexBlog: false,
-      indexPages: true,
-      docsRouteBasePath: '/',
-      searchResultLimits: 8,
-      searchResultContextMaxLength: 50,
-      ignoreFiles: [],
-    },
+      '@easyops-cn/docusaurus-search-local',
+      {
+        hashed: true,
+        language: ['en'],
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: false,
+        indexDocs: true,
+        indexBlog: false,
+        indexPages: true,
+        docsRouteBasePath: '/',
+        searchResultLimits: 8,
+        searchResultContextMaxLength: 50,
+        ignoreFiles: [],
+      },
     ],
   ],
 
-
- presets: [
-  [
-    'classic',
-    {
-      docs: {
-        routeBasePath: '/',                      // serve docs at /
-        sidebarPath: require.resolve('./sidebars.ts'),
-        editUrl:
-          'https://github.com/objectbox/objectbox-c-cpp-docs/blob/main/',
-      },
-      // If you don't need a blog, you can disable it:
-      blog: false,
-      theme: {
-        customCss: [
-          require.resolve('./src/css/custom.css'),
-        ],
-      },
-      sitemap: {           
-        lastmod: 'date',
-        changefreq: 'weekly',
-        priority: 0.5,
-        filename: 'sitemap.xml',
-      },
-      gtag: {                    
-        trackingID: 'G-2LXKBNQ3TW',
-        anonymizeIP: true,
-      },
-    } satisfies Preset.Options,
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          routeBasePath: '/',
+          sidebarPath: require.resolve('./sidebars.ts'),
+          editUrl: 'https://github.com/objectbox/objectbox-c-cpp-docs/blob/main/',
+        },
+        blog: false,
+        theme: { customCss: [require.resolve('./src/css/custom.css')] },
+        sitemap: {
+          lastmod: 'date',
+          changefreq: 'weekly',
+          priority: 0.5,
+          filename: 'sitemap.xml',
+        },
+        gtag: {
+          trackingID: 'G-2LXKBNQ3TW',
+          anonymizeIP: true,
+        },
+      } satisfies Preset.Options,
+    ],
   ],
-],
-
-
 
   themeConfig: {
     image: 'img/objectbox-social-card.jpg',
@@ -81,8 +68,8 @@ const config: Config = {
       title: 'C / C++ Docs',
       logo: {
         alt: 'ObjectBox Logo',
-        src: 'img/objectbox-logo.jpg', // Logo for light mode
-        srcDark: 'img/objectbox-logo-dm.png', // Logo for dark mode
+        src: 'img/objectbox-logo.jpg',
+        srcDark: 'img/objectbox-logo-dm.png',
       },
       items: [
         // Right side items in the order you want them to appear:
@@ -94,7 +81,7 @@ const config: Config = {
         },
         {
           href: 'https://sync.objectbox.io',
-          label: 'Data Sync Docs', 
+          label: 'Data Sync Docs',
           position: 'right',
           //  target: '_self', // ← This prevents external link behavior
         },
@@ -123,15 +110,14 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: [
-        'cmake', 'bash', 'c', 'cpp',
-        'swift', 'kotlin', 'java', 'python', 
-        'dart', 'go', 'protobuf'
-      ],
+      additionalLanguages: ['cmake','bash','c','cpp','swift','kotlin','java','python','dart','go','protobuf'],
     },
-    
-
   } satisfies Preset.ThemeConfig,
+
+  // Put scripts here, inside the same config object
+  scripts: [{ src: '/js/search-analytics.js', async: true }],
+  // Optional: keep this if you want it rendered in the footer
+  // customFields: {},
 };
 
 export default config;
