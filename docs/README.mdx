@@ -68,6 +68,35 @@ Otherwise, feel free to open an issue on [GitHub ](https://github.com/objectbox/
 
 <div align="left"><img src="https://img.shields.io/github/v/release/objectbox/objectbox-c?style=for-the-badge" alt=""/></div>
 
+### 5.0.0 (2025-11-27)
+
+#### User-Specific Data Sync
+
+* Sync filters: define server-side filter expression to sync individual data for each sync user. This is also known as "user-specific data sync" and requires Sync clients version 5.0.
+* Client variables: clients may define key/value pairs that can be used in sync filters
+
+#### New supported platform: Windows ARM64
+
+* Besides x86 and x64, ObjectBox for Windows now also supports ARM64
+
+#### Sync
+
+* Sync clients may now provide certificate locations for SSL (TLS) connections
+
+#### Fixes
+
+* Fixed clearing 1:N backlinks for IDs larger than 32-bit (setting backlink ID to 0 on the "1" side)
+* In-memory with WAL file: improved error handling
+* Safeguard against undefined behavior by panicking in rare illegal usage patterns that are not recoverable. I.e. deleting a (write) transaction in a non-owner thread cannot be safely handled in any other way.
+* Various small improvements and updates under the hood.
+
+#### Examples
+
+* Make each example self-contained, you can e.g. copy an example's directory as a starting point for your own app
+* Add a convenient `build.sh` script to each example that works the same way across examples, e.g. `./build.sh run` to build and run the example in one step
+* Make sources more readable (refactorings, added additional comments)
+* The Task sync example moved to [ObjectBox Sync Examples](https://github.com/objectbox/objectbox-sync-examples)
+
 ### 4.3.0 (2025-05-12)
 
 * Windows: msvc runtime is now embedded to avoid incompatible msvcp140.dll (e.g. those shipped with some JDKs)

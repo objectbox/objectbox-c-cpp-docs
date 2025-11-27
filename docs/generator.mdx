@@ -54,7 +54,7 @@ Once you have the ObjectBox runtime library set up via `FetchContent` (see [inst
 
 ```cmake
 # Note: downloads automatically if not found locally
-find_package(ObjectBoxGenerator 4.0.0 REQUIRED)
+find_package(ObjectBoxGenerator 5.0.0 REQUIRED)
 ```
 
 With that, the CMake function add\_obx\_schema is now available (see next section).
@@ -124,7 +124,7 @@ This find module automatically locates a local installation of the executable `o
 Currently supported platforms are Linux/x86-64, macOS and Windows/x86-64.
 
 ```cmake
-find_package(ObjectBoxGenerator 4.0.0 REQUIRED)Variables
+find_package(ObjectBoxGenerator 5.0.0 REQUIRED)Variables
 ```
 
 The following variables are defined by this module:
@@ -137,7 +137,7 @@ The following variables are defined by this module:
     If found, this variable comprises the full path to executable.
 *   `ObjectBoxGenerator_VERSION`
 
-    The full version string of the used ObjectBox Generator executable, e.g. “4.0.0” or “4.0.0-alpha2”.
+    The full version string of the used ObjectBox Generator executable, e.g. “5.0.0” or “5.0.0-alpha2”.
 *   `ObjectBoxGenerator_VERSION_MAJOR`\
     `ObjectBoxGenerator_VERSION_MINOR`\
     `ObjectBoxGenerator_VERSION_PATCH`
