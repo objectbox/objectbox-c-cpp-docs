@@ -21,4 +21,6 @@ The website is built with Docusaurus that transforms the mdx files along with th
 
 Since Docusaurus is a Node.js application, you need to install Node.js and run `npm install` to install all dependencies.
 
-Then, you can run `npm run start` to start the development server and open the website in a browser. You can also run `npm run build` to build the static website.
+Then, you can run `npm run start` to start the development server and open the website in a browser.
+
+To publish the site, run `npm run build` to build the static website and upload the generated files in `build/`.
