@@ -74,10 +74,14 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'doc',
+      id: 'earlier-versions',
+      label: 'Earlier Versions',
+    },
+    {
+      type: 'doc',
       id: 'faq',
       label: 'FAQ', // Clean label
     },
-    // --- External Links Section ---
     {
       type: 'html',
       value: '<hr class="sidebar-divider">', // Optional: Adds a visual separator
@@ -103,6 +107,11 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'link',
+      label: 'Database Docs',
+      href: 'https://docs.objectbox.io/',
+    },  
+    {
+      type: 'link',
       label: 'Golang Database',
       href: 'https://golang.objectbox.io/',
     },
@@ -111,11 +120,6 @@ const sidebars: SidebarsConfig = {
       label: 'Swift Database',
       href: 'https://swift.objectbox.io/',
     },
-    {
-        type: 'link',
-        label: 'Java Database',
-        href: 'https://docs.objectbox.io/',
-      },
   ],
 };
 
