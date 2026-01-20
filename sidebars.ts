@@ -98,7 +98,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'link',
-      label: 'C API docs',
+      label: 'API docs (C and C++)',
       href: 'https://objectbox.io/docfiles/c/current/',
     },
     {
