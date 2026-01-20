@@ -42,6 +42,11 @@
 - Keep changes in sync so the docs and examples reference the correct release(s).
 - If the search reveals new version locations, update this list in `AGENTS.md` so future bumps include them.
 
+## SEO Schema Maintenance
+- MDX files in `docs/` include a `<TechnicalArticleSchema>` component for SEO structured data.
+- When making meaningful content changes to an MDX file, update the `dateModified` attribute to the current date (format: `YYYY-MM-DD`).
+- Keep `datePublished` unchanged (it reflects the original publication date).
+
 ## Notes for Contributors
 - Main content lives in `docs/`; keep navigation in sync via `sidebars.ts`.
 - When adding new pages, ensure links are valid; `onBrokenLinks` is set to `throw`.
