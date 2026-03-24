@@ -152,58 +152,9 @@ errors are logged and the TX is only partially applied.
 * Make sources more readable (refactorings, added additional comments)
 * The Task sync example moved to [ObjectBox Sync Examples](https://github.com/objectbox/objectbox-sync-examples)
 
-### 4.3.0 (2025-05-12)
-
-* Windows: msvc runtime is now embedded to avoid incompatible msvcp140.dll (e.g. those shipped with some JDKs)
-* External property types (via [MongoDB connector](https://sync.objectbox.io/mongodb-sync-connector)): JsonToNative to support sub (embedded/nested) documents/arrays in MongoDB
-* External property types (via MongoDB connector): support ID mapping to UUIDs (v4 and v7)
-* Admin: add class and dependency diagrams to the schema page (view and download)
-* Admin: improved data view for large vectors by displaying only the first elements and the full vector in a dialog
-* Admin: detects images stored as bytes and shows them as such (PNG, GIF, JPEG, SVG, WEBP)
-
-#### Sync
-
-* Add "Log Events" for important server events, which can be viewed on new Admin page
-* Detect and ignore changes for objects that were put but were unchanged
-* The limit for message size was raised to 32 MB
-* Transactions above the message size limit will already fail on the client now (to better enforce the limit)
-* C++: add missing APIs for JWT token credentials
-
-### 4.2.0 (2025-03-04)
-
-* Extended the model by external names and types: allows defining a different name for an external database, which ObjectBox syncs with.
-
-This prepares upcoming features for our [MongoDB Sync Connector](https://sync.objectbox.io/mongodb-sync-connector).
-
-### 4.1.0 (2025-01-28)
-
-* New query conditions for map properties (via flex properties): now supports key/value pairs for inequality conditions (e.g. greater than, less than) for string, integer and floating point values
-* Vector search: add "Geo" distance type for longitude/latitude pairs
-* Various internal improvements
-
-#### Sync
-
-* Add JWT authentication
-* Sync clients can now send multiple credentials for login
-
-### 4.0 (2024-11-11)
-
-Note: 4.0.3 the first 4.0.x version working with ObjectBox Generator 4.0 and thus is the first full 4.0 release. For individual changes in the runtime library check the GitHub release notes: [4.0.0](https://github.com/objectbox/objectbox-c/releases/tag/v4.0.0), [4.0.1](https://github.com/objectbox/objectbox-c/releases/tag/v4.0.1) and [4.0.2](https://github.com/objectbox/objectbox-c/releases/tag/v4.0.2).
-
-* CMake stubs to easily integrate with [ObjectBox Generator 4.0](https://github.com/objectbox/objectbox-generator/releases/tag/v4.0.0)
-* ObjectBox now supports vector search ("vector database") to enable efficient similarity searches.\
-  This is particularly useful for AI/ML/RAG applications, e.g. image, audio, or text similarity.\
-  Other use cases include semantic search or recommendation engines.\
-  See [https://docs.objectbox.io/ann-vector-search](https://docs.objectbox.io/ann-vector-search) for details.
-* Adjusting the version number to match the core version (4.0); we will be aligning on major versions from now on.
-* Made closing the store more robust; e.g. it waits for ongoing queries and transactions to finish\
-  (please still ensure to clean up properly on your side, this is an additional safety net)
-* Made Box API more robust when racing against store closing
-* Add "vectorsearch-cities" example
-
 ### Earlier Versions
 
-Changelogs for versions before 4.0 are now in [Earlier Versions](/earlier-versions).
+Changelogs for versions before 5.0 are now in [Earlier Versions](/earlier-versions).
 
 ## ObjectBox Generator
 
